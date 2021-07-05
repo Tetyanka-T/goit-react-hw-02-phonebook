@@ -1,30 +1,35 @@
 import React, { Component } from 'react';
+import s from 'components/Form/Form.module.css';
 
 export default class Form extends Component {
   state = {
     name: '',
     number: '',
   };
+
   handleChange = e => {
     const { name, value } = e.currentTarget;
     this.setState({ [name]: value });
   };
+
   handleSubmit = e => {
     e.preventDefault();
-    this.props.onSubmit(this.state.name, this.state.number);
+    this.props.onSubmit({ ...this.state });
+
     this.reset();
   };
   reset = () => {
-    this.state({ name: '', number: '' });
+    this.setState({ name: '', number: '' });
   };
 
   render() {
     return (
       <>
-        <form onSubmit={this.handleSubmit}>
-          <label>
+        <form className={s.form} onSubmit={this.handleSubmit}>
+          <label className={s.label}>
             Name
             <input
+              className={s.input}
               type="text"
               name="name"
               value={this.state.name}
@@ -34,9 +39,10 @@ export default class Form extends Component {
               required
             />
           </label>
-          <label>
+          <label className={s.label}>
             Number
             <input
+              className={s.input}
               type="tel"
               name="number"
               value={this.state.number}
@@ -47,7 +53,9 @@ export default class Form extends Component {
             />
           </label>
 
-          <button type="submit">Add contact</button>
+          <button className={s.button} type="submit">
+            Add contact
+          </button>
         </form>
       </>
     );

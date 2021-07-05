@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { nanoid } from 'nanoid';
-import Form from './components/Form';
-import ContactList from 'components/Contacts';
+import Container from './components/Container/Container';
+import Form from './components/Form/Form';
+import ContactList from 'components/Contact/Contacts';
 import Filter from 'components/Filter';
 
 export default class App extends Component {
@@ -16,14 +17,24 @@ export default class App extends Component {
   };
 
   addContact = task => {
-    const contact = {
-      ...task,
-      id: nanoid(),
-    };
+    const searchSameName = this.state.contacts
+      .map(contact => contact.name)
+      .includes(task.name);
 
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, contact],
-    }));
+    if (searchSameName) {
+      alert(`${task.name} is already in contacts`);
+    } else if (task.name.length === 0) {
+      alert('Fields must be filled!');
+    } else {
+      const contact = {
+        ...task,
+        id: nanoid(),
+      };
+
+      this.setState(prevState => ({
+        contacts: [contact, ...prevState.contacts],
+      }));
+    }
   };
 
   deleteContact = contactId => {
@@ -32,16 +43,33 @@ export default class App extends Component {
     }));
   };
 
+  changeFilter = e => {
+    this.setState({ filter: e.currentTarget.value });
+  };
+
+  showVisibleContact = () => {
+    const normalizedFilter = this.state.filter.toLowerCase();
+    return this.state.contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter),
+    );
+  };
+
   render() {
-    const { contacts } = this.state.contacts;
-    const { filter } = this.state.filter;
+    const { filter } = this.state;
+    const visibleContacts = this.showVisibleContact();
+
     return (
       <div>
-        <h1>Phonebook</h1>
-        <Form onSubmit={this.addContact} />
-        <h2>Contacts</h2>
-        <Filter value={filter} onChangeFilter={this.changeFilter} />
-        <ContactList contacts={contacts} onDeleteContact={this.deleteContact} />
+        <Container>
+          <h1>Phonebook</h1>
+          <Form onSubmit={this.addContact} />
+          <h2>Contacts</h2>
+          <Filter value={filter} onChange={this.changeFilter} />
+          <ContactList
+            contacts={visibleContacts}
+            onDeleteContact={this.deleteContact}
+          />
+        </Container>
       </div>
     );
   }
